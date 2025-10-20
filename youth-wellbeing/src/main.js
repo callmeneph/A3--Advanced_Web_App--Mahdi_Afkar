@@ -3,6 +3,7 @@ import { VueFire, VueFireAuth } from 'vuefire'
 import App from './App.vue'
 import router from './router'
 import { app as fbApp } from '@/lib/firebase'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 createApp(App)
   .use(router)

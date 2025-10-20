@@ -1,10 +1,11 @@
 <template>
-  <div class="container py-4">
-    <h1>Youth Mental Health & Wellbeing</h1>
-    <p class="mt-2">Explore resources and record your daily mood.</p>
-    <RouterLink to="/resources" class="btn btn-primary me-2">Resources</RouterLink>
-    <RouterLink to="/checkin" class="btn btn-success me-2">Mood Check-in</RouterLink>
-    <RouterLink to="/me/checkins" class="btn btn-outline-secondary">My History</RouterLink>
+  <div class="py-5">
+    <h1 class="display-5 fw-bold">Youth Mental Health & Wellbeing</h1>
+    <p class="lead mt-3">Explore resources and record your daily mood.</p>
+
+    <div class="d-flex gap-2 mt-4">
+      <RouterLink to="/checkin" class="btn btn-primary">Daily Check-in</RouterLink>
+      <RouterLink to="/resources" class="btn btn-outline-secondary">Resources</RouterLink>
+    </div>
   </div>
 </template>
-

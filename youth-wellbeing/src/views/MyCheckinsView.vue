@@ -1,42 +1,68 @@
-<script setup>
-import { db, auth } from '@/lib/firebase'
-import { collection, query, where, orderBy } from 'firebase/firestore'
-import { useCurrentUser, useCollection } from 'vuefire'
-
-import axios from 'axios'
-import { getIdToken } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
-
-const user = useCurrentUser()
-const q = computed(()=> user.value
-  ? query(collection(db,'checkins'), where('uid','==',user.value.uid), orderBy('createdAt','desc'))
-  : null
-)
-const myCheckins = useCollection(q)
-
-const count = ref<number|null>(null)
-onMounted(async () => {
-  const u = auth.currentUser
-  if (u) {
-    const token = await getIdToken(u, true)
-    const { data } = await axios.get('https://australia-southeast1-youth-wellbeing-mafkar.cloudfunctions.net/getCheckinCount', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    count.value = data.count
-  }
-})
-</script>
-
 <template>
-  <div class="container py-4">
-    <h2>My Check-ins</h2>
-    <p v-if="!myCheckins">Sign in to see your history.</p>
-    <ul v-else class="list-group">
-      <li v-for="c in myCheckins" :key="c.id" class="list-group-item">
-        <strong>Mood:</strong> {{ c.mood }} — <em>{{ c.note }}</em>
-        <span class="text-muted float-end">{{ c.createdAt?.toDate?.().toLocaleString?.() }}</span>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">My History</h2>
+    <span class="badge bg-secondary" v-if="count !== null">Total: {{ count }}</span>
+  </div>
+
+  <div v-if="!user" class="alert alert-warning">
+    Please <RouterLink to="/signin">sign in</RouterLink> to view your history.
+  </div>
+
+  <div v-else>
+    <div v-if="loading" class="text-muted">Loading…</div>
+    <div v-else-if="items.length === 0" class="alert alert-info">No check-ins yet.</div>
+
+    <ul class="list-group">
+      <li v-for="c in items" :key="c.id" class="list-group-item d-flex justify-content-between">
+        <div>
+          <div class="fw-semibold">Mood: {{ c.mood }}</div>
+          <div class="small text-muted" v-if="c.note">{{ c.note }}</div>
+        </div>
+        <div class="small text-muted">{{ format(c.createdAt) }}</div>
       </li>
-      <p class="mt-3" v-if="count !== null"><strong>Total check-ins:</strong> {{ count }}</p>
     </ul>
   </div>
 </template>
+
+<script setup>
+import { ref as vueRef, onMounted, watch } from 'vue'
+import { auth, db } from '@/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore'
+
+const items = vueRef([])
+const loading = vueRef(true)
+const user = vueRef(null)
+const count = vueRef(null)
+
+const COUNT_URL = 'https://getcheckincount-wka7tvn5da-ts.a.run.app' 
+
+onMounted(() => onAuthStateChanged(auth, u => user.value = u))
+
+watch(user, async (u) => {
+  if (!u) return
+  loading.value = true
+  const q = query(
+    collection(db, 'checkins'),
+    where('uid', '==', u.uid),
+    orderBy('createdAt', 'desc')
+  )
+  const snap = await getDocs(q)
+  items.value = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+
+  // fetch count from Cloud Function
+  try {
+    const res = await fetch(`${COUNT_URL}?uid=${encodeURIComponent(u.uid)}`)
+    const data = await res.json()
+    count.value = data.count ?? null
+  } catch { count.value = null }
+
+  loading.value = false
+})
+
+function format(ts) {
+  if (!ts) return ''
+  const d = ts.toDate ? ts.toDate() : new Date(ts)
+  return d.toLocaleString()
+}
+</script>

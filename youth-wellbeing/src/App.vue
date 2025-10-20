@@ -1,18 +1,26 @@
 <template>
-  <nav class="navbar navbar-light bg-light px-3">
-    <RouterLink to="/" class="navbar-brand">Wellbeing</RouterLink>
-    <div class="d-flex gap-3">
-      <RouterLink to="/resources">Resources</RouterLink>
-      <RouterLink to="/checkin">Check-in</RouterLink>
-      <RouterLink to="/me/checkins">My History</RouterLink>
-      <RouterLink to="/admin">Admin</RouterLink>
-      <RouterLink to="/signin">Sign in</RouterLink>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container">
+      <RouterLink to="/" class="navbar-brand fw-bold">Wellbeing</RouterLink>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><RouterLink class="nav-link" to="/resources">Resources</RouterLink></li>
+          <li class="nav-item"><RouterLink class="nav-link" to="/checkin">Check-in</RouterLink></li>
+          <li class="nav-item"><RouterLink class="nav-link" to="/mine">My History</RouterLink></li>
+        </ul>
+
+        <div class="d-flex gap-2">
+          <RouterLink class="btn btn-outline-primary btn-sm" to="/signin">Sign in</RouterLink>
+        </div>
+      </div>
     </div>
   </nav>
-  <RouterView />
-</template>
 
-<style>
-a { text-decoration:none }
-.navbar a.router-link-exact-active { font-weight:700 }
-</style>
+  <main class="container py-4">
+    <RouterView />
+  </main>
+</template>
