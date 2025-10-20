@@ -1,28 +1,39 @@
-<template>
-  <h2 class="mb-3">Sign in</h2>
-
-  <div v-if="user" class="alert alert-success d-flex justify-content-between align-items-center">
-    <div>Signed in as <strong>{{ user.email }}</strong></div>
-    <button class="btn btn-outline-danger btn-sm" @click="logout">Sign out</button>
-  </div>
-
-  <button v-else class="btn btn-primary" @click="login">Continue with Google</button>
-</template>
-
 <script setup>
-import { ref as vueRef, onMounted } from 'vue'
-import { auth } from '@/firebase'
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
-const user = vueRef(null)
+const router = useRouter()
+const route = useRoute()
+const { user, signIn, signOut } = useAuth()
 
-onMounted(() => onAuthStateChanged(auth, u => user.value = u))
-
-async function login() {
-  const provider = new GoogleAuthProvider()
-  await signInWithPopup(auth, provider)
+const doSignIn = async () => {
+  await signIn()
+  const back = route.query.redirect || '/'
+  router.replace(back)
 }
-async function logout() {
-  await signOut(auth)
+
+const doSignOut = async () => {
+  await signOut()
 }
 </script>
+
+<template>
+  <section class="container">
+    <h1>Sign In</h1>
+
+    <div v-if="!user">
+      <p>Use your Google account to continue.</p>
+      <button @click="doSignIn">Sign in with Google</button>
+    </div>
+
+    <div v-else>
+      <p>Signed in as <strong>{{ user.displayName || user.email }}</strong></p>
+      <button @click="doSignOut">Sign out</button>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.container { max-width: 720px; margin: 2rem auto; }
+button { padding: .6rem 1rem; cursor: pointer; }
+</style>
