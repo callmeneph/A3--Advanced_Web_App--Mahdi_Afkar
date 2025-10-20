@@ -3,12 +3,28 @@ import { db, auth } from '@/lib/firebase'
 import { collection, query, where, orderBy } from 'firebase/firestore'
 import { useCurrentUser, useCollection } from 'vuefire'
 
+import axios from 'axios'
+import { getIdToken } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
+
 const user = useCurrentUser()
 const q = computed(()=> user.value
   ? query(collection(db,'checkins'), where('uid','==',user.value.uid), orderBy('createdAt','desc'))
   : null
 )
 const myCheckins = useCollection(q)
+
+const count = ref<number|null>(null)
+onMounted(async () => {
+  const u = auth.currentUser
+  if (u) {
+    const token = await getIdToken(u, true)
+    const { data } = await axios.get('YOUR_FUNCTION_URL/getCheckinCount', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    count.value = data.count
+  }
+})
 </script>
 
 <template>
