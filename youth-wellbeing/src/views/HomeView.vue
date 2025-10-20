@@ -7,3 +7,4 @@
     <RouterLink to="/me/checkins" class="btn btn-outline-secondary">My History</RouterLink>
   </div>
 </template>
+
