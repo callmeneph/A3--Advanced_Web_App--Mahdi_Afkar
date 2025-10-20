@@ -9,3 +9,16 @@ const SignInView = () => import('@/views/SignInView.vue')
 
 
 
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    { path: '/', name: 'home', component: HomeView },
+    { path: '/resources', name: 'resources', component: ResourcesView },
+    { path: '/checkin', name: 'checkin', component: CheckinView },
+    { path: '/me/checkins', name: 'my-checkins', component: MyCheckinsView },
+    { path: '/admin', name: 'admin', component: AdminView },
+    { path: '/signin', name: 'signin', component: SignInView },
+  ],
+})
+
+export default router
