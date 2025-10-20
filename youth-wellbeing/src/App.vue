@@ -1,29 +1,26 @@
-<script setup>
-import { useAuth } from '@/composables/useAuth'
-const { user, signOut } = useAuth()
-</script>
-
 <template>
-  <header class="topnav">
-    <nav>
-      <router-link to="/">Home</router-link>
-      <router-link to="/resources">Resources</router-link>
-      <router-link v-if="user" to="/check-in">Check-in</router-link>
-      <router-link v-if="user" to="/my">My History</router-link>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container">
+      <RouterLink to="/" class="navbar-brand fw-bold">Wellbeing</RouterLink>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-      <span class="spacer" />
+      <div id="nav" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><RouterLink class="nav-link" to="/resources">Resources</RouterLink></li>
+          <li class="nav-item"><RouterLink class="nav-link" to="/checkin">Check-in</RouterLink></li>
+          <li class="nav-item"><RouterLink class="nav-link" to="/mine">My History</RouterLink></li>
+        </ul>
 
-      <router-link v-if="!user" to="/sign-in">Sign in</router-link>
-      <button v-else @click="signOut">Sign out</button>
-    </nav>
-  </header>
+        <div class="d-flex gap-2">
+          <RouterLink class="btn btn-outline-primary btn-sm" to="/signin">Sign in</RouterLink>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  <router-view />
+  <main class="container py-4">
+    <RouterView />
+  </main>
 </template>
-
-<style scoped>
-.topnav { padding: .75rem 1rem; border-bottom: 1px solid #ddd; }
-nav { display: flex; gap: 1rem; align-items: center; }
-.spacer { flex: 1; }
-button { padding: .4rem .8rem; cursor: pointer; }
-</style>
